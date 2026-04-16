@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Update Billing #{{ record.billingID }}{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-3 gap-2">
+  <a href="/billing" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
+  <h2 class="mb-0">Billing Record #{{ record.billingID }}</h2>
+</div>
+
+<div class="card shadow-sm" style="max-width:520px">
+  <div class="card-body">
+    <p class="text-muted mb-3">
+      Patient: <strong>{{ record.patientName }}</strong>
+      {% if record.providerName %}
+        &nbsp;|&nbsp; Insurance: <strong>{{ record.providerName }}</strong> ({{ record.policyNumber }})
+      {% endif %}
+    </p>
+
+    <form method="post">
+      <div class="row g-3">
+        <div class="col-sm-6">
+          <label class="form-label">Total Amount ($)</label>
+          <input type="number" name="totalAmount" step="0.01" min="0"
+                 class="form-control" value="{{ "%.2f"|format(record.totalAmount) }}" required>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label">Amount Paid ($)</label>
+          <input type="number" name="amountPaid" step="0.01" min="0"
+                 class="form-control" value="{{ "%.2f"|format(record.amountPaid) }}" required>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label">Due Date</label>
+          <input type="date" name="dueDate" class="form-control"
+                 value="{{ record.dueDate or '' }}">
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label">Current Status</label>
+          <input class="form-control" disabled
+                 value="{{ record.paymentStatus }}">
+          <div class="form-text">Auto-set from paid amount on save.</div>
+        </div>
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-check-lg me-1"></i>Save
+        </button>
+        <a href="/billing" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

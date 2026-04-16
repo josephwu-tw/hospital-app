@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Doctor{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-3 gap-2">
+  <a href="/doctors" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
+  <h2 class="mb-0">{{ action }} Doctor</h2>
+</div>
+
+<div class="card shadow-sm" style="max-width:680px">
+  <div class="card-body">
+    <form method="post">
+      <h6 class="text-muted mb-3">Personal Information</h6>
+      <div class="row g-3">
+        <div class="col-sm-6">
+          <label class="form-label">First Name <span class="text-danger">*</span></label>
+          <input type="text" name="firstName" class="form-control" required
+                 value="{{ doctor.firstName if doctor else '' }}">
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label">Last Name <span class="text-danger">*</span></label>
+          <input type="text" name="lastName" class="form-control" required
+                 value="{{ doctor.lastName if doctor else '' }}">
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
+          <input type="date" name="dateOfBirth" class="form-control" required
+                 value="{{ doctor.dateOfBirth if doctor else '' }}">
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label">Phone</label>
+          <input type="text" name="phone" class="form-control"
+                 value="{{ doctor.phone if doctor else '' }}">
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-control"
+                 value="{{ doctor.email if doctor else '' }}">
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label">Address</label>
+          <input type="text" name="address" class="form-control"
+                 value="{{ doctor.address if doctor else '' }}">
+        </div>
+      </div>
+
+      <h6 class="text-muted mt-4 mb-3">Staff & Doctor Details</h6>
+      <div class="row g-3">
+        {% if action == 'Create' %}
+        <div class="col-sm-6">
+          <label class="form-label">Employee ID <span class="text-danger">*</span></label>
+          <input type="text" name="employeeID" class="form-control" required>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label">Hire Date <span class="text-danger">*</span></label>
+          <input type="date" name="hireDate" class="form-control" required>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label">License Number <span class="text-danger">*</span></label>
+          <input type="text" name="licenseNumber" class="form-control" required>
+        </div>
+        {% endif %}
+        <div class="col-sm-6">
+          <label class="form-label">Salary</label>
+          <input type="number" name="salary" step="0.01" class="form-control"
+                 value="{{ doctor.salary if doctor else '' }}">
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label">Specialization</label>
+          <input type="text" name="specialization" class="form-control"
+                 value="{{ doctor.specialization if doctor else '' }}">
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label">Years of Experience</label>
+          <input type="number" name="yearsExperience" min="0" class="form-control"
+                 value="{{ doctor.yearsExperience if doctor else '' }}">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Department <span class="text-danger">*</span></label>
+          <select name="deptID" class="form-select" required>
+            <option value="">— select —</option>
+            {% for dept in departments %}
+              <option value="{{ dept.deptID }}"
+                {% if doctor and doctor.deptID == dept.deptID %}selected{% endif %}>
+                {{ dept.deptName }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-secondary">
+          <i class="bi bi-check-lg me-1"></i>{{ action }} Doctor
+        </button>
+        <a href="/doctors" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

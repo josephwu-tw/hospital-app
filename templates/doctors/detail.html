@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Dr. {{ doctor.firstName }} {{ doctor.lastName }}{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-3 gap-2">
+  <a href="/doctors" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
+  <h2 class="mb-0">Dr. {{ doctor.firstName }} {{ doctor.lastName }}</h2>
+  <a href="/doctors/{{ doctor.personID }}/edit" class="btn btn-sm btn-outline-primary ms-auto">
+    <i class="bi bi-pencil me-1"></i>Edit
+  </a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-header fw-semibold">Personal Details</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-5">Employee ID</dt>   <dd class="col-7">{{ doctor.employeeID }}</dd>
+          <dt class="col-5">Date of Birth</dt> <dd class="col-7">{{ doctor.dateOfBirth }}</dd>
+          <dt class="col-5">Phone</dt>          <dd class="col-7">{{ doctor.phone or '—' }}</dd>
+          <dt class="col-5">Email</dt>          <dd class="col-7">{{ doctor.email or '—' }}</dd>
+          <dt class="col-5">Address</dt>        <dd class="col-7">{{ doctor.address or '—' }}</dd>
+          <dt class="col-5">Hire Date</dt>      <dd class="col-7">{{ doctor.hireDate }}</dd>
+          <dt class="col-5">Salary</dt>         <dd class="col-7">${{ "%.2f"|format(doctor.salary) }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-header fw-semibold">Medical Details</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-5">License #</dt>         <dd class="col-7">{{ doctor.licenseNumber }}</dd>
+          <dt class="col-5">Specialization</dt>    <dd class="col-7">{{ doctor.specialization or '—' }}</dd>
+          <dt class="col-5">Experience</dt>         <dd class="col-7">{{ doctor.yearsExperience or '—' }} yrs</dd>
+          <dt class="col-5">Department</dt>         <dd class="col-7">{{ doctor.deptName }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h5>Recent Appointments</h5>
+{% if appointments %}
+<div class="card shadow-sm">
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr><th>#</th><th>Date & Time</th><th>Patient</th><th>Type</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        {% for a in appointments %}
+        <tr>
+          <td>{{ a.appointmentID }}</td>
+          <td>{{ a.scheduledDateTime }}</td>
+          <td>{{ a.patientName }}</td>
+          <td>{{ a.appointmentType or '—' }}</td>
+          <td><span class="badge badge-{{ a.status }}">{{ a.status }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<p class="text-muted">No appointments on record.</p>
+{% endif %}
+{% endblock %}

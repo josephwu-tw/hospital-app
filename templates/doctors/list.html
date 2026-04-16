@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Doctors{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2><i class="bi bi-person-badge me-2"></i>Doctors</h2>
+  <a href="/doctors/new" class="btn btn-secondary"><i class="bi bi-person-plus me-1"></i>Add Doctor</a>
+</div>
+
+{% if doctors %}
+<div class="card shadow-sm">
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr><th>ID</th><th>Name</th><th>Specialization</th><th>Department</th>
+            <th>License #</th><th>Employee ID</th><th>Hire Date</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for d in doctors %}
+        <tr>
+          <td>{{ d.personID }}</td>
+          <td><a href="/doctors/{{ d.personID }}">{{ d.firstName }} {{ d.lastName }}</a></td>
+          <td>{{ d.specialization or '—' }}</td>
+          <td>{{ d.deptName }}</td>
+          <td>{{ d.licenseNumber }}</td>
+          <td>{{ d.employeeID }}</td>
+          <td>{{ d.hireDate }}</td>
+          <td>
+            <a href="/doctors/{{ d.personID }}/edit" class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-pencil"></i>
+            </a>
+            <form method="post" action="/doctors/{{ d.personID }}/delete" class="d-inline"
+                  onsubmit="return confirm('Delete Dr. {{ d.lastName }}?')">
+              <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="alert alert-info">No doctors found. <a href="/doctors/new">Add one.</a></div>
+{% endif %}
+{% endblock %}

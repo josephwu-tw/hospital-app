@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Analytics Dashboard{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-bar-chart-line me-2"></i>Analytics Dashboard</h2>
+
+{% macro query_table(title, query_num, rows, cols, labels) %}
+<div class="card shadow-sm mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span><strong>Query {{ query_num }}</strong> — {{ title }}</span>
+    <span class="badge bg-secondary">{{ rows | length }} row(s)</span>
+  </div>
+  {% if rows %}
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover table-sm mb-0">
+        <thead>
+          <tr>{% for l in labels %}<th>{{ l }}</th>{% endfor %}</tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+          <tr>{% for c in cols %}<td>{{ row[c] if row[c] is not none else '—' }}</td>{% endfor %}</tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="card-body text-muted">No results.</div>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{{ query_table(
+    "Patients currently waiting in queue",
+    1, q1,
+    ['personID','firstName','lastName','deptName','queuePos','arrivalTime','queueStatus'],
+    ['ID','First','Last','Department','Queue Pos','Arrival Time','Status']
+) }}
+
+{{ query_table(
+    "Average wait time per department (> 10 min)",
+    2, q2,
+    ['deptName','avgWaitMinutes'],
+    ['Department','Avg Wait (min)']
+) }}
+
+{{ query_table(
+    "Doctors with 2+ appointments & average billing",
+    3, q3,
+    ['doctorID','firstName','lastName','totalAppointments','avgBillingAmount'],
+    ['Doctor ID','First','Last','Total Appointments','Avg Billing ($)']
+) }}
+
+{{ query_table(
+    "Patients who waited 30+ minutes beyond scheduled time",
+    4, q4,
+    ['patientID','firstName','lastName','appointmentID','scheduledDateTime','waitMinutes'],
+    ['Patient ID','First','Last','Appt #','Scheduled','Wait (min)']
+) }}
+
+{{ query_table(
+    "Unpaid billing records older than 30 days",
+    5, q5,
+    ['billingID','patientName','doctorName','totalAmount','billingDate','daysOverdue'],
+    ['Billing ID','Patient','Doctor','Amount ($)','Billing Date','Days Overdue']
+) }}
+
+{{ query_table(
+    "Appointments canceled/rescheduled more than once",
+    6, q6,
+    ['appointmentID','patientName','doctorName','status','rescheduleCount','scheduledDateTime'],
+    ['Appt #','Patient','Doctor','Status','Reschedule Count','Scheduled']
+) }}
+
+{{ query_table(
+    "Full treatment history with device usage",
+    7, q7,
+    ['appointmentID','scheduledDateTime','patientName','diagnosis','treatmentPlan','deviceName','usagePurpose'],
+    ['Appt #','Date','Patient','Diagnosis','Treatment Plan','Device','Purpose']
+) }}
+
+{% endblock %}

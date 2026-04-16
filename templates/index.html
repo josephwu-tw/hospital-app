@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Hospital System{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h2>
+
+<div class="row g-3 mb-5">
+  <div class="col-sm-6 col-lg-4">
+    <div class="card stat-card blue shadow-sm">
+      <div class="card-body d-flex align-items-center gap-3">
+        <i class="bi bi-people-fill fs-2 text-primary"></i>
+        <div>
+          <div class="fs-1 fw-bold">{{ stats.patients }}</div>
+          <div class="text-muted">Registered Patients</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-4">
+    <div class="card stat-card green shadow-sm">
+      <div class="card-body d-flex align-items-center gap-3">
+        <i class="bi bi-person-badge-fill fs-2 text-success"></i>
+        <div>
+          <div class="fs-1 fw-bold">{{ stats.doctors }}</div>
+          <div class="text-muted">Doctors</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-4">
+    <div class="card stat-card teal shadow-sm">
+      <div class="card-body d-flex align-items-center gap-3">
+        <i class="bi bi-calendar-check-fill fs-2 text-info"></i>
+        <div>
+          <div class="fs-1 fw-bold">{{ stats.appointments }}</div>
+          <div class="text-muted">Total Appointments</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-4">
+    <div class="card stat-card orange shadow-sm">
+      <div class="card-body d-flex align-items-center gap-3">
+        <i class="bi bi-hourglass-split fs-2 text-warning"></i>
+        <div>
+          <div class="fs-1 fw-bold">{{ stats.waiting }}</div>
+          <div class="text-muted">Patients Waiting</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-4">
+    <div class="card stat-card red shadow-sm">
+      <div class="card-body d-flex align-items-center gap-3">
+        <i class="bi bi-exclamation-circle-fill fs-2 text-danger"></i>
+        <div>
+          <div class="fs-1 fw-bold">{{ stats.unpaid }}</div>
+          <div class="text-muted">Unpaid Bills</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h5 class="mb-3">Quick Actions</h5>
+<div class="row g-2">
+  <div class="col-auto"><a href="/patients/new"     class="btn btn-primary"><i class="bi bi-person-plus me-1"></i>New Patient</a></div>
+  <div class="col-auto"><a href="/appointments/new" class="btn btn-success"><i class="bi bi-calendar-plus me-1"></i>Schedule Appointment</a></div>
+  <div class="col-auto"><a href="/doctors/new"      class="btn btn-secondary"><i class="bi bi-person-badge me-1"></i>Add Doctor</a></div>
+  <div class="col-auto"><a href="/analytics"        class="btn btn-info text-white"><i class="bi bi-bar-chart me-1"></i>View Analytics</a></div>
+</div>
+{% endblock %}
