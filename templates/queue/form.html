@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Add to Queue{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-3 gap-2">
+  <a href="/queue" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
+  <h2 class="mb-0">Add Patient to Queue</h2>
+</div>
+
+<div class="card shadow-sm" style="max-width:600px">
+  <div class="card-body">
+    {% if appointments %}
+    <form method="post">
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Select Appointment <span class="text-danger">*</span></label>
+        <select name="appointmentID" class="form-select" required>
+          <option value="">— select appointment —</option>
+          {% for a in appointments %}
+          <option value="{{ a.appointmentID }}">
+            #{{ a.appointmentID }} — {{ a.patientName }} with {{ a.doctorName }}
+            ({{ a.scheduledDateTime.strftime('%Y-%m-%d %H:%M') if a.scheduledDateTime else '' }}
+            · {{ a.appointmentType or '' }})
+          </option>
+          {% endfor %}
+        </select>
+        <div class="form-text">Only scheduled appointments not already in queue are shown.</div>
+      </div>
+      <p class="text-muted small mb-3">
+        <i class="bi bi-info-circle me-1"></i>
+        Arrival time will be set to <strong>now</strong>. Status will be <strong>Waiting</strong>.
+      </p>
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-plus-circle me-1"></i>Add to Queue
+        </button>
+        <a href="/queue" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+    {% else %}
+    <div class="alert alert-info mb-0">
+      <i class="bi bi-info-circle me-2"></i>
+      No scheduled appointments available to add to queue.
+      All scheduled appointments are already in queue, or there are none.
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

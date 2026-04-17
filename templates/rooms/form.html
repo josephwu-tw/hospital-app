@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Room{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-3 gap-2">
+  <a href="/rooms" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
+  <h2 class="mb-0">{{ action }} Room</h2>
+</div>
+
+<div class="card shadow-sm" style="max-width:520px">
+  <div class="card-body">
+    <form method="post">
+      <div class="row g-3">
+        <div class="col-sm-6">
+          <label class="form-label fw-semibold">Room Number <span class="text-danger">*</span></label>
+          <input type="text" name="roomNumber" class="form-control" required
+                 value="{{ room.roomNumber if room else '' }}" placeholder="e.g., A101">
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label fw-semibold">Type</label>
+          <select name="roomType" class="form-select">
+            {% for t in ['General', 'ICU', 'Operating', 'Emergency', 'Consultation', 'Lab', 'Radiology'] %}
+              <option value="{{ t }}" {% if room and room.roomType == t %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label fw-semibold">Floor</label>
+          <input type="text" name="floor" class="form-control"
+                 value="{{ room.floor if room else '' }}" placeholder="e.g., 2">
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label fw-semibold">Capacity</label>
+          <input type="number" name="capacity" class="form-control" min="1"
+                 value="{{ room.capacity if room else '' }}" placeholder="e.g., 4">
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label fw-semibold">Department <span class="text-danger">*</span></label>
+          <select name="deptID" class="form-select" required>
+            <option value="">— select —</option>
+            {% for d in departments %}
+              <option value="{{ d.deptID }}" {% if room and room.deptID == d.deptID %}selected{% endif %}>
+                {{ d.deptName }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label fw-semibold">Status</label>
+          <select name="status" class="form-select">
+            {% for s in ['Available', 'Occupied', 'Maintenance'] %}
+              <option value="{{ s }}" {% if room and room.status == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-success">
+          <i class="bi bi-check-lg me-1"></i>{{ action }}
+        </button>
+        <a href="/rooms" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

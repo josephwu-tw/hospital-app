@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Medical Record #{{ record.recordID }}{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-3 gap-2">
+  <a href="/records" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
+  <h2 class="mb-0">Medical Record #{{ record.recordID }}</h2>
+  <a href="/records/{{ record.recordID }}/edit" class="btn btn-sm btn-outline-secondary ms-auto">
+    <i class="bi bi-pencil me-1"></i>Edit
+  </a>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-header fw-semibold"><i class="bi bi-person me-2"></i>Patient & Appointment</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-5">Patient</dt>
+          <dd class="col-7">{{ record.patientName }}</dd>
+          <dt class="col-5">Doctor</dt>
+          <dd class="col-7">{{ record.doctorName }}</dd>
+          <dt class="col-5">Appointment</dt>
+          <dd class="col-7">#{{ record.appointmentID }} — {{ record.appointmentType or '—' }}</dd>
+          <dt class="col-5">Scheduled</dt>
+          <dd class="col-7">{{ record.scheduledDateTime }}</dd>
+          <dt class="col-5">Record Date</dt>
+          <dd class="col-7">{{ record.recordDate }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-header fw-semibold"><i class="bi bi-clipboard2-pulse me-2"></i>Clinical Notes</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-5">Diagnosis</dt>
+          <dd class="col-7">{{ record.diagnosis or '—' }}</dd>
+          <dt class="col-5">Treatment Plan</dt>
+          <dd class="col-7">{{ record.treatmentPlan or '—' }}</dd>
+          <dt class="col-5">Prescriptions</dt>
+          <dd class="col-7">{{ record.prescriptions or '—' }}</dd>
+          <dt class="col-5">Lab Results</dt>
+          <dd class="col-7">{{ record.labResults or '—' }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  {% if devices %}
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-header fw-semibold"><i class="bi bi-tools me-2"></i>Medical Devices Used</div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <thead><tr><th>Device</th><th>Type</th><th>Usage Date</th><th>Duration (min)</th><th>Purpose</th></tr></thead>
+          <tbody>
+            {% for d in devices %}
+            <tr>
+              <td>{{ d.deviceName }}</td>
+              <td>{{ d.deviceType or '—' }}</td>
+              <td>{{ d.usageDate }}</td>
+              <td>{{ d.duration or '—' }}</td>
+              <td>{{ d.usagePurpose or '—' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<div class="mt-3">
+  <form method="post" action="/records/{{ record.recordID }}/delete"
+        onsubmit="return confirm('Delete this medical record?')">
+    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Delete Record</button>
+  </form>
+</div>
+{% endblock %}

@@ -2,12 +2,21 @@
 {% block title %}Analytics Dashboard{% endblock %}
 
 {% block content %}
-<h2 class="mb-4"><i class="bi bi-bar-chart-line me-2"></i>Analytics Dashboard</h2>
+<div class="page-header">
+  <h2><i class="bi bi-bar-chart-line me-2"></i>Analytics Dashboard</h2>
+  <span class="text-muted small">16 operational queries</span>
+</div>
 
-{% macro query_table(title, query_num, rows, cols, labels) %}
+{% macro query_table(title, query_num, rows, cols, labels, description='') %}
 <div class="card shadow-sm mb-4">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <span><strong>Query {{ query_num }}</strong> — {{ title }}</span>
+  <div class="card-header d-flex justify-content-between align-items-center py-2">
+    <div>
+      <span class="badge bg-primary me-2">Q{{ query_num }}</span>
+      <strong>{{ title }}</strong>
+      {% if description %}
+      <small class="text-muted ms-2">— {{ description }}</small>
+      {% endif %}
+    </div>
     <span class="badge bg-secondary">{{ rows | length }} row(s)</span>
   </div>
   {% if rows %}
@@ -26,58 +35,94 @@
     </div>
   </div>
   {% else %}
-  <div class="card-body text-muted">No results.</div>
+  <div class="card-body text-muted small"><i class="bi bi-info-circle me-1"></i>No results.</div>
   {% endif %}
 </div>
 {% endmacro %}
 
-{{ query_table(
-    "Patients currently waiting in queue",
-    1, q1,
-    ['personID','firstName','lastName','deptName','queuePos','arrivalTime','queueStatus'],
-    ['ID','First','Last','Department','Queue Pos','Arrival Time','Status']
-) }}
+<ul class="nav nav-tabs mb-4" id="analyticsTab" role="tablist">
+  <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-queue">Queue & Wait</button></li>
+  <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-appointments">Appointments</button></li>
+  <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-resources">Resources</button></li>
+  <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-billing">Billing</button></li>
+  <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-reports">Reports</button></li>
+</ul>
 
-{{ query_table(
-    "Average wait time per department (> 10 min)",
-    2, q2,
-    ['deptName','avgWaitMinutes'],
-    ['Department','Avg Wait (min)']
-) }}
+<div class="tab-content">
 
-{{ query_table(
-    "Doctors with 2+ appointments & average billing",
-    3, q3,
-    ['doctorID','firstName','lastName','totalAppointments','avgBillingAmount'],
-    ['Doctor ID','First','Last','Total Appointments','Avg Billing ($)']
-) }}
+  <!-- Queue & Wait -->
+  <div class="tab-pane fade show active" id="tab-queue">
+    {{ query_table("Patients Currently Waiting", 1, q1,
+        ['personID','firstName','lastName','deptName','queuePos','arrivalTime','queueStatus'],
+        ['ID','First Name','Last Name','Department','Queue Pos','Arrival Time','Status']) }}
+    {{ query_table("Avg Wait Time per Department (> 10 min)", 2, q2,
+        ['deptName','avgWaitMinutes'],
+        ['Department','Avg Wait (min)'],
+        'Only departments with avg wait > 10 minutes') }}
+    {{ query_table("Peak Hours by Patient Arrivals", 7, q7,
+        ['hourSlot','patientCount'],
+        ['Hour of Day','Patient Count'],
+        'Based on queue arrival times') }}
+    {{ query_table("Patients Who Waited 30+ Minutes Beyond Scheduled", 8, q8,
+        ['patientID','firstName','lastName','appointmentID','scheduledDateTime','waitMinutes'],
+        ['Patient ID','First','Last','Appt #','Scheduled','Wait (min)']) }}
+    {{ query_table("Avg Wait Before vs After Policy Date (2025-01-01)", 15, q15,
+        ['before_date','avgWaitBefore','after_date','avgWaitAfter'],
+        ['Period','Avg Wait (min)','Period','Avg Wait (min)'],
+        'Compares queue wait times around the policy implementation date') }}
+  </div>
 
-{{ query_table(
-    "Patients who waited 30+ minutes beyond scheduled time",
-    4, q4,
-    ['patientID','firstName','lastName','appointmentID','scheduledDateTime','waitMinutes'],
-    ['Patient ID','First','Last','Appt #','Scheduled','Wait (min)']
-) }}
+  <!-- Appointments -->
+  <div class="tab-pane fade" id="tab-appointments">
+    {{ query_table("Doctors with Most Appointments (Past Month)", 3, q3,
+        ['doctorID','firstName','lastName','deptName','apptCount'],
+        ['Doctor ID','First','Last','Department','Appointments']) }}
+    {{ query_table("Appointments Canceled/Rescheduled More Than Once", 5, q5,
+        ['appointmentID','patientName','doctorName','status','rescheduleCount','scheduledDateTime'],
+        ['Appt #','Patient','Doctor','Status','Reschedule Count','Scheduled']) }}
+    {{ query_table("Avg Consultation Duration per Doctor", 9, q9,
+        ['doctorID','firstName','lastName','avgLagMinutes','completedCount'],
+        ['Doctor ID','First','Last','Avg Delay (min)','Completed Appts'],
+        'Time between scheduled and actual start') }}
+    {{ query_table("Departments with Highest Patient Volume", 10, q10,
+        ['deptID','deptName','volume'],
+        ['Dept ID','Department','Total Appointments']) }}
+    {{ query_table("Doctors with Highest Cancellation Rates", 16, q16,
+        ['doctorID','firstName','lastName','totalAppts','canceledAppts','cancelRate'],
+        ['Doctor ID','First','Last','Total Appts','Canceled','Cancel Rate (%)']) }}
+  </div>
 
-{{ query_table(
-    "Unpaid billing records older than 30 days",
-    5, q5,
-    ['billingID','patientName','doctorName','totalAmount','billingDate','daysOverdue'],
-    ['Billing ID','Patient','Doctor','Amount ($)','Billing Date','Days Overdue']
-) }}
+  <!-- Resources -->
+  <div class="tab-pane fade" id="tab-resources">
+    {{ query_table("Medical Devices with Utilization > 90%", 4, q4,
+        ['deviceID','deviceName','deviceType','utilizationPct'],
+        ['Device ID','Name','Type','Utilization (%)'],
+        'Based on total usage hours in last 30 days / 720 hrs') }}
+    {{ query_table("Medical Equipment Idle for 48+ Hours", 13, q13,
+        ['deviceID','deviceName','deviceType','status','lastUsed','idleDays'],
+        ['Device ID','Name','Type','Status','Last Used','Idle Days']) }}
+  </div>
 
-{{ query_table(
-    "Appointments canceled/rescheduled more than once",
-    6, q6,
-    ['appointmentID','patientName','doctorName','status','rescheduleCount','scheduledDateTime'],
-    ['Appt #','Patient','Doctor','Status','Reschedule Count','Scheduled']
-) }}
+  <!-- Billing -->
+  <div class="tab-pane fade" id="tab-billing">
+    {{ query_table("Unpaid Bills Older Than 30 Days", 11, q11,
+        ['billingID','patientName','doctorName','totalAmount','billingDate','daysOverdue'],
+        ['Billing ID','Patient','Doctor','Amount ($)','Billing Date','Days Overdue']) }}
+    {{ query_table("Patients Who Visited 5+ Times in Last Year", 12, q12,
+        ['patientID','firstName','lastName','visitCount'],
+        ['Patient ID','First','Last','Visit Count'],
+        'Completed appointments only') }}
+  </div>
 
-{{ query_table(
-    "Full treatment history with device usage",
-    7, q7,
-    ['appointmentID','scheduledDateTime','patientName','diagnosis','treatmentPlan','deviceName','usagePurpose'],
-    ['Appt #','Date','Patient','Diagnosis','Treatment Plan','Device','Purpose']
-) }}
+  <!-- Reports -->
+  <div class="tab-pane fade" id="tab-reports">
+    {{ query_table("Full Treatment History with Device Usage", 6, q6,
+        ['appointmentID','scheduledDateTime','patientName','diagnosis','treatmentPlan','deviceName','usagePurpose'],
+        ['Appt #','Date','Patient','Diagnosis','Treatment Plan','Device','Purpose']) }}
+    {{ query_table("Daily Report: Appointments & Completed Treatments (Last 30 Days)", 14, q14,
+        ['reportDate','totalAppointments','completedTreatments'],
+        ['Date','Total Appointments','Completed Treatments']) }}
+  </div>
 
+</div>
 {% endblock %}

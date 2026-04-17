@@ -2,15 +2,27 @@
 {% block title %}Patients{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="page-header">
   <h2><i class="bi bi-people me-2"></i>Patients</h2>
   <a href="/patients/new" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i>New Patient</a>
 </div>
 
 {% if patients %}
-<div class="card shadow-sm">
+<div class="d-flex align-items-center gap-2 mb-3">
+  <div class="input-group search-bar">
+    <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+    <input type="text" id="tbl-search" class="form-control border-start-0"
+           placeholder="Search patients…" autocomplete="off">
+    <button id="tbl-search-clear" class="btn btn-outline-secondary" type="button">
+      <i class="bi bi-x"></i>
+    </button>
+  </div>
+  <span class="text-muted small" id="tbl-search-count">{{ patients | length }}</span>
+</div>
+
+<div class="card shadow-sm table-card">
   <div class="card-body p-0">
-    <table class="table table-hover mb-0">
+    <table class="table table-hover mb-0" id="main-table">
       <thead>
         <tr>
           <th>ID</th><th>Name</th><th>Date of Birth</th>
@@ -30,9 +42,8 @@
             <a href="/patients/{{ pt.personID }}/edit" class="btn btn-sm btn-outline-secondary">
               <i class="bi bi-pencil"></i>
             </a>
-            <form method="post" action="/patients/{{ pt.personID }}/delete"
-                  class="d-inline"
-                  onsubmit="return confirm('Delete {{ pt.firstName }} {{ pt.lastName }}?')">
+            <form method="post" action="/patients/{{ pt.personID }}/delete" class="d-inline"
+                  data-confirm="Delete patient {{ pt.firstName }} {{ pt.lastName }}? This cannot be undone.">
               <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
             </form>
           </td>
@@ -45,4 +56,11 @@
 {% else %}
 <div class="alert alert-info">No patients found. <a href="/patients/new">Add one.</a></div>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  initTableSearch('tbl-search', 'main-table');
+  initSortableTable('main-table');
+</script>
 {% endblock %}

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Medical Record{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-3 gap-2">
+  <a href="/records" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
+  <h2 class="mb-0">{{ action }} Medical Record</h2>
+</div>
+
+<div class="card shadow-sm" style="max-width:680px">
+  <div class="card-body">
+    <form method="post">
+      <div class="row g-3">
+
+        {% if action == 'Create' %}
+        <div class="col-12">
+          <label class="form-label fw-semibold">Appointment <span class="text-danger">*</span></label>
+          <select name="appointmentID" class="form-select" required>
+            <option value="">— select appointment —</option>
+            {% for a in appointments %}
+            <option value="{{ a.appointmentID }}" {% if preselect and preselect == a.appointmentID|string %}selected{% endif %}>
+              #{{ a.appointmentID }} — {{ a.patientName }} with {{ a.doctorName }}
+              ({{ a.scheduledDateTime }})
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        {% else %}
+        <div class="col-12">
+          <div class="alert alert-light mb-0">
+            <strong>Appointment:</strong> #{{ record.appointmentID }} —
+            {{ record.patientName }} with {{ record.doctorName }}
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="col-sm-6">
+          <label class="form-label fw-semibold">Record Date <span class="text-danger">*</span></label>
+          <input type="date" name="recordDate" class="form-control" required
+                 value="{{ record.recordDate if record else '' }}">
+        </div>
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">Diagnosis</label>
+          <textarea name="diagnosis" class="form-control" rows="2"
+                    placeholder="Primary diagnosis / findings">{{ record.diagnosis if record else '' }}</textarea>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">Treatment Plan</label>
+          <textarea name="treatmentPlan" class="form-control" rows="2"
+                    placeholder="Recommended treatment plan">{{ record.treatmentPlan if record else '' }}</textarea>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">Prescriptions</label>
+          <textarea name="prescriptions" class="form-control" rows="2"
+                    placeholder="Medications prescribed">{{ record.prescriptions if record else '' }}</textarea>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">Lab Results</label>
+          <textarea name="labResults" class="form-control" rows="2"
+                    placeholder="Lab / imaging results">{{ record.labResults if record else '' }}</textarea>
+        </div>
+
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-success">
+          <i class="bi bi-check-lg me-1"></i>{{ action }}
+        </button>
+        <a href="/records" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -2,15 +2,36 @@
 {% block title %}Appointments{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="page-header">
   <h2><i class="bi bi-calendar-check me-2"></i>Appointments</h2>
   <a href="/appointments/new" class="btn btn-success"><i class="bi bi-calendar-plus me-1"></i>Schedule</a>
 </div>
 
 {% if appointments %}
-<div class="card shadow-sm">
+<!-- Search + status filter row -->
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+  <div class="input-group search-bar">
+    <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+    <input type="text" id="tbl-search" class="form-control border-start-0"
+           placeholder="Search appointments…" autocomplete="off">
+    <button id="tbl-search-clear" class="btn btn-outline-secondary" type="button">
+      <i class="bi bi-x"></i>
+    </button>
+  </div>
+  <span class="text-muted small" id="tbl-search-count">{{ appointments | length }}</span>
+
+  <div class="ms-auto d-flex gap-1 flex-wrap">
+    <span class="text-muted small align-self-center me-1">Filter:</span>
+    <button class="btn btn-sm btn-outline-primary"   data-filter-status="Scheduled">Scheduled</button>
+    <button class="btn btn-sm btn-outline-success"   data-filter-status="Completed">Completed</button>
+    <button class="btn btn-sm btn-outline-danger"    data-filter-status="Canceled">Canceled</button>
+    <button class="btn btn-sm btn-outline-warning"   data-filter-status="Rescheduled">Rescheduled</button>
+  </div>
+</div>
+
+<div class="card shadow-sm table-card">
   <div class="card-body p-0">
-    <table class="table table-hover mb-0">
+    <table class="table table-hover mb-0" id="main-table">
       <thead>
         <tr>
           <th>#</th><th>Scheduled</th><th>Patient</th><th>Doctor</th>
@@ -26,16 +47,29 @@
           <td>{{ a.doctorName }}</td>
           <td>{{ a.deptName or '—' }}</td>
           <td>{{ a.roomNumber or '—' }}</td>
-          <td>{{ a.appointmentType or '—' }}</td>
+          <td><span class="badge bg-secondary">{{ a.appointmentType or '—' }}</span></td>
           <td><span class="badge badge-{{ a.status }}">{{ a.status }}</span></td>
           <td>
-            <a href="/appointments/{{ a.appointmentID }}/edit"
-               class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
-            <form method="post" action="/appointments/{{ a.appointmentID }}/delete"
-                  class="d-inline"
-                  onsubmit="return confirm('Delete appointment #{{ a.appointmentID }}?')">
-              <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-            </form>
+            <div class="d-flex gap-1">
+              <a href="/appointments/{{ a.appointmentID }}/edit"
+                 class="btn btn-sm btn-outline-secondary" title="Edit">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <a href="/queue/add" class="btn btn-sm btn-outline-warning" title="Add to Queue">
+                <i class="bi bi-hourglass-split"></i>
+              </a>
+              <a href="/records/new?appointment={{ a.appointmentID }}"
+                 class="btn btn-sm btn-outline-info" title="Medical Record">
+                <i class="bi bi-file-medical"></i>
+              </a>
+              <form method="post" action="/appointments/{{ a.appointmentID }}/delete"
+                    class="d-inline"
+                    data-confirm="Delete appointment #{{ a.appointmentID }} for {{ a.patientName }}?">
+                <button class="btn btn-sm btn-outline-danger" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            </div>
           </td>
         </tr>
         {% endfor %}
@@ -46,4 +80,12 @@
 {% else %}
 <div class="alert alert-info">No appointments yet. <a href="/appointments/new">Schedule one.</a></div>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  initTableSearch('tbl-search', 'main-table');
+  initSortableTable('main-table');
+  initStatusFilter('main-table');
+</script>
 {% endblock %}

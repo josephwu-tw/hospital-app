@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Billing{% endblock %}
+{% block title %}Medical Records{% endblock %}
 
 {% block content %}
 <div class="page-header">
-  <h2><i class="bi bi-receipt me-2"></i>Billing</h2>
-  <div class="text-muted">Outstanding: <strong class="text-danger">${{ "%.2f"|format(total_unpaid) }}</strong></div>
+  <h2><i class="bi bi-file-medical me-2"></i>Medical Records</h2>
+  <a href="/records/new" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i>New Record</a>
 </div>
 
 {% if records %}
@@ -12,7 +12,7 @@
   <div class="input-group search-bar">
     <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
     <input type="text" id="tbl-search" class="form-control border-start-0"
-           placeholder="Search billing records…" autocomplete="off">
+           placeholder="Search records…" autocomplete="off">
     <button id="tbl-search-clear" class="btn btn-outline-secondary" type="button">
       <i class="bi bi-x"></i>
     </button>
@@ -25,30 +25,30 @@
     <table class="table table-hover mb-0" id="main-table">
       <thead>
         <tr>
-          <th>#</th><th>Patient</th><th>Doctor</th><th>Appt #</th>
-          <th>Total</th><th>Paid</th><th>Outstanding</th>
-          <th>Billing Date</th><th>Due Date</th><th>Status</th><th>Actions</th>
+          <th>#</th><th>Date</th><th>Patient</th><th>Doctor</th>
+          <th>Appt #</th><th>Diagnosis</th><th>Actions</th>
         </tr>
       </thead>
       <tbody>
         {% for r in records %}
         <tr>
-          <td>{{ r.billingID }}</td>
+          <td>{{ r.recordID }}</td>
+          <td>{{ r.recordDate }}</td>
           <td>{{ r.patientName }}</td>
           <td>{{ r.doctorName }}</td>
           <td>{{ r.appointmentID }}</td>
-          <td>${{ "%.2f"|format(r.totalAmount) }}</td>
-          <td>${{ "%.2f"|format(r.amountPaid) }}</td>
-          <td class="{% if r.outstanding > 0 %}text-danger fw-semibold{% endif %}">
-            ${{ "%.2f"|format(r.outstanding) }}
-          </td>
-          <td>{{ r.billingDate }}</td>
-          <td>{{ r.dueDate or '—' }}</td>
-          <td><span class="badge badge-{{ r.paymentStatus }}">{{ r.paymentStatus }}</span></td>
+          <td>{{ (r.diagnosis or '—')[:60] }}{% if r.diagnosis and r.diagnosis|length > 60 %}…{% endif %}</td>
           <td>
-            <a href="/billing/{{ r.billingID }}/edit" class="btn btn-sm btn-outline-secondary">
+            <a href="/records/{{ r.recordID }}" class="btn btn-sm btn-outline-primary" title="View">
+              <i class="bi bi-eye"></i>
+            </a>
+            <a href="/records/{{ r.recordID }}/edit" class="btn btn-sm btn-outline-secondary" title="Edit">
               <i class="bi bi-pencil"></i>
             </a>
+            <form method="post" action="/records/{{ r.recordID }}/delete" class="d-inline"
+                  data-confirm="Delete medical record #{{ r.recordID }} for {{ r.patientName }}?">
+              <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+            </form>
           </td>
         </tr>
         {% endfor %}
@@ -57,7 +57,7 @@
   </div>
 </div>
 {% else %}
-<div class="alert alert-info">No billing records found.</div>
+<div class="alert alert-info">No medical records found. <a href="/records/new">Create one.</a></div>
 {% endif %}
 {% endblock %}
 
