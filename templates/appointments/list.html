@@ -48,7 +48,7 @@
           <td>{{ a.deptName or '—' }}</td>
           <td>{{ a.roomNumber or '—' }}</td>
           <td><span class="badge bg-secondary">{{ a.appointmentType or '—' }}</span></td>
-          <td><span class="badge badge-{{ a.status }}">{{ a.status }}</span></td>
+          <td><span class="badge status-badge badge-{{ a.status }}">{{ a.status }}</span></td>
           <td>
             <div class="d-flex gap-1">
               <a href="/appointments/{{ a.appointmentID }}/edit"
@@ -84,8 +84,7 @@
 
 {% block scripts %}
 <script>
-  initTableSearch('tbl-search', 'main-table');
+  initStatusFilter('main-table', initTableSearch('tbl-search', 'main-table'));
   initSortableTable('main-table');
-  initStatusFilter('main-table');
 </script>
 {% endblock %}

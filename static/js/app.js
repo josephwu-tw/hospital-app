@@ -13,13 +13,17 @@ function initTableSearch(inputId, tableId) {
 
   function filter() {
     const q = input.value.trim().toLowerCase();
+    const activeStatus = table.dataset.activeStatus || '';
     let visible = 0;
     rows.forEach(row => {
-      const match = !q || row.textContent.toLowerCase().includes(q);
+      const textMatch = !q || row.textContent.toLowerCase().includes(q);
+      const statusBadge = row.querySelector('.status-badge');
+      const statusMatch = !activeStatus || (statusBadge && statusBadge.textContent.trim() === activeStatus);
+      const match = textMatch && statusMatch;
       row.style.display = match ? '' : 'none';
       if (match) visible++;
     });
-    if (countEl) countEl.textContent = q ? `${visible} of ${total}` : `${total}`;
+    if (countEl) countEl.textContent = (q || activeStatus) ? `${visible} of ${total}` : `${total}`;
     if (clearEl) clearEl.style.display = q ? 'flex' : 'none';
   }
 
@@ -31,6 +35,7 @@ function initTableSearch(inputId, tableId) {
   }
 
   filter();
+  return filter;
 }
 
 // ── Sortable column headers ───────────────────────────────────────────────────
@@ -127,19 +132,21 @@ function initQueueRefresh(seconds) {
 }
 
 // ── Status filter pills (appointments) ───────────────────────────────────────
-function initStatusFilter(tableId) {
+function initStatusFilter(tableId, refilterFn) {
   const pills = document.querySelectorAll('[data-filter-status]');
   const table = document.getElementById(tableId);
   if (!pills.length || !table) return;
 
-  const rows = Array.from(table.querySelectorAll('tbody tr'));
-
   function applyFilter(status) {
-    rows.forEach(row => {
-      const badge = row.querySelector('.badge');
-      const match = !status || (badge && badge.textContent.trim() === status);
-      row.style.display = match ? '' : 'none';
-    });
+    table.dataset.activeStatus = status;
+    if (refilterFn) {
+      refilterFn();
+    } else {
+      Array.from(table.querySelectorAll('tbody tr')).forEach(row => {
+        const badge = row.querySelector('.status-badge');
+        row.style.display = (!status || (badge && badge.textContent.trim() === status)) ? '' : 'none';
+      });
+    }
     pills.forEach(p => p.classList.toggle('active', p.dataset.filterStatus === status));
   }
 
