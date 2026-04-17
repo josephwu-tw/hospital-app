@@ -145,8 +145,11 @@ Open **http://127.0.0.1:5001** in your browser.
 ```
 hospital-app/
 ├── app.py                  # Flask app entry point
-├── config.py               # DB config and user credentials
+├── config.py               # DB config and user credentials (local)
+├── config.example.py       # Template for local setup
+├── config.cloud.py         # Template for GCP Cloud Run deployment
 ├── db.py                   # MySQL connection and query helpers
+├── Dockerfile              # Container definition for GCP Cloud Run
 ├── requirements.txt        # Python dependencies
 ├── routes/
 │   ├── auth.py             # Login / logout
@@ -196,6 +199,27 @@ Key design features:
 - **Trigger**: auto-creates a `Billing` record on appointment insert
 - **View**: `v_waiting_patients` for real-time queue visibility
 - **Stored procedure**: `sp_complete_appointment` marks appointment complete and updates queue
+
+---
+
+## GCP Deployment (Cloud Run + Cloud SQL)
+
+To deploy on Google Cloud Platform:
+
+1. **Copy cloud config** — `cp config.cloud.py config.py`
+2. **Set environment variables** in Cloud Run:
+   - `DB_USER`, `DB_PASS`, `DB_NAME` — Cloud SQL credentials
+   - `INSTANCE_UNIX_SOCKET` — Cloud SQL Auth Proxy socket (auto-set by Cloud Run)
+   - `SECRET_KEY` — a strong random string
+3. **Enable connection pooling** in `db.py` — uncomment the GCP block and comment out the local block
+4. **Build and deploy:**
+```bash
+gcloud builds submit --tag gcr.io/<PROJECT_ID>/hospital-app
+gcloud run deploy hospital-app \
+  --image gcr.io/<PROJECT_ID>/hospital-app \
+  --add-cloudsql-instances <INSTANCE_CONNECTION_NAME> \
+  --set-env-vars INSTANCE_UNIX_SOCKET=/cloudsql/<INSTANCE_CONNECTION_NAME>,...
+```
 
 ---
 
