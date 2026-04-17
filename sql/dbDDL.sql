@@ -325,6 +325,14 @@ CREATE PROCEDURE sp_complete_appointment(
     IN p_actualStart   DATETIME
 )
 BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+
     UPDATE Appointment
     SET    status = 'Completed',
            actualStartTime = p_actualStart
@@ -334,6 +342,8 @@ BEGIN
     SET    queueStatus = 'Served',
            calledTime  = p_actualStart
     WHERE  appointmentID = p_appointmentID;
+
+    COMMIT;
 END$$
 
 DELIMITER ;
