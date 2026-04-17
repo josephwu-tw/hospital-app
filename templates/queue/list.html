@@ -77,6 +77,7 @@
           <th>Type</th>
           <th>Arrived</th>
           <th>Called</th>
+          <th>Wait (min)</th>
           <th>Status</th>
           <th>Actions</th>
         </tr>
@@ -92,12 +93,19 @@
           <td>{{ e.arrivalTime.strftime('%H:%M') if e.arrivalTime else '—' }}</td>
           <td>{{ e.calledTime.strftime('%H:%M') if e.calledTime else '—' }}</td>
           <td>
+            {% if e.waitMinutes is not none %}
+              <span class="fw-semibold {% if e.queueStatus == 'Waiting' %}text-warning{% endif %}">
+                {{ e.waitMinutes }}
+              </span>
+            {% else %}—{% endif %}
+          </td>
+          <td>
             <span class="badge badge-{{ e.queueStatus }}">{{ e.queueStatus }}</span>
           </td>
           <td class="d-flex gap-1">
             {% if e.queueStatus == 'Waiting' %}
             <form method="post" action="/queue/{{ e.appointmentID }}/{{ e.queuePos }}/call">
-              <button class="btn btn-sm btn-success">
+              <button class="btn btn-sm btn-success" title="Call patient &amp; complete appointment">
                 <i class="bi bi-bell me-1"></i>Call
               </button>
             </form>

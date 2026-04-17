@@ -30,7 +30,7 @@ PUBLIC_ENDPOINTS = {'auth.login', 'auth.logout', 'static'}
 
 @app.before_request
 def require_login():
-    if request.endpoint in PUBLIC_ENDPOINTS:
+    if request.endpoint is None or request.endpoint in PUBLIC_ENDPOINTS:
         return
     if 'user' not in session:
         return redirect(url_for('auth.login'))

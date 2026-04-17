@@ -11,10 +11,10 @@ def dashboard():
         SELECT p.personID, p.firstName, p.lastName,
                d.deptName, q.queuePos, q.arrivalTime, q.queueStatus
         FROM Queue q
-        JOIN Appointment a ON q.appointmentID = a.appointmentID
-        JOIN Room        r ON a.roomID        = r.roomID
-        JOIN Department  d ON r.deptID        = d.deptID
-        JOIN Person      p ON a.patientID     = p.personID
+        JOIN Appointment a  ON q.appointmentID = a.appointmentID
+        LEFT JOIN Room      r ON a.roomID      = r.roomID
+        LEFT JOIN Department d ON r.deptID     = d.deptID
+        JOIN Person         p ON a.patientID   = p.personID
         WHERE q.queueStatus = 'Waiting'
         ORDER BY q.arrivalTime
     """)
@@ -24,9 +24,9 @@ def dashboard():
         SELECT d.deptName,
                ROUND(AVG(TIMESTAMPDIFF(MINUTE, q.arrivalTime, q.calledTime)), 2) AS avgWaitMinutes
         FROM Queue q
-        JOIN Appointment a ON q.appointmentID = a.appointmentID
-        JOIN Room        r ON a.roomID        = r.roomID
-        JOIN Department  d ON r.deptID        = d.deptID
+        JOIN Appointment  a ON q.appointmentID = a.appointmentID
+        LEFT JOIN Room    r ON a.roomID        = r.roomID
+        LEFT JOIN Department d ON r.deptID    = d.deptID
         WHERE q.calledTime IS NOT NULL
         GROUP BY d.deptName
         HAVING avgWaitMinutes > 10
@@ -130,8 +130,8 @@ def dashboard():
     q10 = execute_query("""
         SELECT d.deptID, d.deptName, COUNT(a.appointmentID) AS volume
         FROM Department  d
-        JOIN Room        r ON r.deptID        = d.deptID
-        JOIN Appointment a ON a.roomID        = r.roomID
+        LEFT JOIN Room        r ON r.deptID   = d.deptID
+        LEFT JOIN Appointment a ON a.roomID   = r.roomID
         GROUP BY d.deptID, d.deptName
         ORDER BY volume DESC
     """)

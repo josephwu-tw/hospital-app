@@ -7,7 +7,8 @@ _LIST_SQL = """
     SELECT q.appointmentID, q.queuePos, q.arrivalTime, q.calledTime, q.queueStatus,
            CONCAT(p.firstName, ' ', p.lastName) AS patientName,
            CONCAT(doc.firstName, ' ', doc.lastName) AS doctorName,
-           d.deptName, a.scheduledDateTime, a.appointmentType
+           d.deptName, a.scheduledDateTime, a.appointmentType,
+           fn_wait_duration(q.appointmentID, q.queuePos) AS waitMinutes
     FROM Queue q
     JOIN Appointment a  ON q.appointmentID = a.appointmentID
     JOIN Person p       ON a.patientID     = p.personID
@@ -65,14 +66,10 @@ def add_to_queue():
 @queue_bp.route('/queue/<int:aid>/<int:pos>/call', methods=['POST'])
 def call_patient(aid, pos):
     try:
-        execute_update(
-            """UPDATE Queue SET calledTime=NOW(), queueStatus='Served'
-               WHERE appointmentID=%s AND queuePos=%s""",
-            (aid, pos)
-        )
-        flash('Patient marked as served.', 'success')
+        execute_update("CALL sp_complete_appointment(%s, NOW())", (aid,))
+        flash('Patient called — appointment marked Completed.', 'success')
     except Exception as e:
-        flash(f'Error updating queue: {e}', 'danger')
+        flash(f'Error calling patient: {e}', 'danger')
     return redirect(url_for('queue.list_queue'))
 
 

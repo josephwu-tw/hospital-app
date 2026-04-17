@@ -22,7 +22,7 @@
           <dt class="col-5">Email</dt>          <dd class="col-7">{{ doctor.email or '—' }}</dd>
           <dt class="col-5">Address</dt>        <dd class="col-7">{{ doctor.address or '—' }}</dd>
           <dt class="col-5">Hire Date</dt>      <dd class="col-7">{{ doctor.hireDate }}</dd>
-          <dt class="col-5">Salary</dt>         <dd class="col-7">${{ "%.2f"|format(doctor.salary) }}</dd>
+          <dt class="col-5">Salary</dt>         <dd class="col-7">{% if doctor.salary is not none %}${{ "%.2f"|format(doctor.salary) }}{% else %}—{% endif %}</dd>
         </dl>
       </div>
     </div>
