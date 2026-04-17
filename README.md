@@ -23,11 +23,12 @@ A full-stack web application for managing hospital operations including patient 
 - **Patient Management** — Register, view, edit, and delete patient profiles
 - **Doctor Management** — Manage doctors with department and specialization info
 - **Appointment Scheduling** — Book, edit, cancel, and reschedule appointments
-- **Queue Management** — Add patients to queue, call/serve them, auto-refreshing live view
+- **Queue Management** — Add patients to queue; calling a patient atomically completes the appointment and updates the queue via stored procedure; auto-refreshing live view with wait duration
 - **Medical Records** — Create and manage treatment records linked to appointments
 - **Billing** — Track payments, outstanding balances, and payment status
 - **Departments & Rooms** — Manage hospital departments and room allocations
 - **Analytics Dashboard** — 16 operational SQL queries organized across 5 tabs
+- **Database Schema** — Interactive schema reference showing all 16 tables, relationships, and advanced DB objects
 - **Live Table Search** — Client-side search and sortable columns on all list pages
 - **Status Filters** — Filter appointments by Scheduled / Completed / Canceled / Rescheduled
 
@@ -161,6 +162,7 @@ hospital-app/
 ├── templates/              # Jinja2 HTML templates
 │   ├── base.html
 │   ├── index.html
+│   ├── schema.html             # Interactive DB schema reference
 │   ├── auth/
 │   ├── patients/
 │   ├── appointments/
