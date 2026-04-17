@@ -62,5 +62,10 @@ def index():
     return render_template('index.html', stats=stats, recent_appts=recent_appts)
 
 
+@app.route('/schema')
+def schema():
+    return render_template('schema.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

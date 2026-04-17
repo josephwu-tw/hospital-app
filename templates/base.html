@@ -90,6 +90,10 @@
           <a class="nav-link {% if request.endpoint and request.endpoint.startswith('analytics') %}active{% endif %}"
              href="/analytics"><i class="bi bi-bar-chart-line me-1"></i>Analytics</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'schema' %}active{% endif %}"
+             href="/schema"><i class="bi bi-diagram-3 me-1"></i>Schema</a>
+        </li>
       </ul>
       {% if session.user %}
       <div class="navbar-nav ms-3 align-items-center">
