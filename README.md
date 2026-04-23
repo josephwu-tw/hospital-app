@@ -48,8 +48,8 @@ A full-stack web application for managing hospital operations including patient 
 ## Prerequisites
 
 - Python 3.9+
-- MySQL 8.0+
 - pip
+- A GCP account with access to the Cloud SQL instance (see below), **or** a local MySQL 8.0+ installation
 
 ---
 
@@ -58,7 +58,7 @@ A full-stack web application for managing hospital operations including patient 
 ### 1. Clone the repository
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/josephwu-tw/hospital-app.git
 cd hospital-app
 ```
 
@@ -78,23 +78,35 @@ pip install -r requirements.txt
 
 ### 4. Configure the database connection
 
-`config.py` is excluded from version control. Copy the example file and fill in your MySQL password:
+`config.py` is excluded from version control. Copy the example file and fill in your credentials:
 
 ```bash
 cp config.example.py config.py
 ```
 
-Then edit `config.py`:
+#### Option A — GCP Cloud SQL (recommended)
+
+The database is hosted on **GCP Cloud SQL for MySQL 8.0**.
+
+| Item | Value |
+|---|---|
+| GCP Project | `db-group10-490718` |
+| Cloud SQL Instance | `hospital-db` |
+| Region | `us-central1` |
+| Public IP | `34.66.22.5` |
+| Database | `hospital_db` |
+
+Edit `config.py` to point to Cloud SQL:
 
 ```python
 DB_CONFIG = {
-    'host': 'localhost',
+    'host': '34.66.22.5',
     'user': 'root',
-    'password': 'YOUR_MYSQL_PASSWORD',
+    'password': '<ask-team-for-password>',
     'database': 'hospital_db',
 }
 
-SECRET_KEY = 'any-random-string-you-want'  # e.g. 'mygroupproject2026'
+SECRET_KEY = 'hospital-app-dev-secret-key-5200'
 
 USERS = {
     'admin':  {'password': 'admin123',  'role': 'admin', 'name': 'Hospital Administrator'},
@@ -103,7 +115,28 @@ USERS = {
 }
 ```
 
-### 5. Create the database and load sample data
+> **IP Authorization:** Your public IP must be authorized on the Cloud SQL instance. To add your IP, run:
+> ```bash
+> gcloud sql instances patch hospital-db \
+>   --authorized-networks=YOUR_PUBLIC_IP/32 \
+>   --project=db-group10-490718
+> ```
+> Find your public IP at https://ifconfig.me
+
+#### Option B — Local MySQL
+
+If you prefer to run MySQL locally:
+
+```python
+DB_CONFIG = {
+    'host': 'localhost',
+    'user': 'root',
+    'password': 'YOUR_MYSQL_PASSWORD',
+    'database': 'hospital_db',
+}
+```
+
+Then create the database and load sample data:
 
 ```bash
 mysql -u root -p < sql/dbDDL.sql
@@ -118,7 +151,7 @@ mysql -u root -p < sql/dbDDL.sql
 mysql -u root -p < sql/dbDML.sql
 ```
 
-### 6. Run the application
+### 5. Run the application
 
 ```bash
 python app.py
